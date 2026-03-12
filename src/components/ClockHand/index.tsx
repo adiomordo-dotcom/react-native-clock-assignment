@@ -1,13 +1,23 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import { ClockHandProps } from './types';
+import { View, Animated, StyleSheet } from 'react-native'
+import { ClockHandProps, HAND_RANGE, HandType } from './types';
+export { HandType } from './types';
 
 const HAND_SIZE = 3;
+export const HAND_COLOR: Record<HandType, string> = {
+    [HandType.HOUR]: '#212121',
+    [HandType.MINUTE]: '#1565C0',
+    [HandType.SECOND]: '#E53935',
+};
 
-const ClockHand = ({ clockSize }: ClockHandProps) => {
+const ClockHand = ({ clockSize, value, handType }: ClockHandProps) => {
+    const rotation = value.interpolate({
+        inputRange: [0, HAND_RANGE[handType]],
+        outputRange: ['0deg', '360deg'],
+    });
     return (
         <View style={styles.container}>
-            <View style={[styles.hand, { height: (clockSize / 2) * 0.8 }]} />
+            <Animated.View style={[styles.hand, { height: (clockSize / 2) * 0.8, transform: [{ rotate: rotation }], backgroundColor: HAND_COLOR[handType] }]} />
         </View>
     )
 }
@@ -30,5 +40,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#1F1F1F',
         borderRadius: 6,
         width: HAND_SIZE,
+        transformOrigin: 'bottom'
     },
 });
