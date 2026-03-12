@@ -1,13 +1,34 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { CLOCK_SIZE, DOT_SIZE } from '../constants';
-import { ClockDialProps } from './types';
+import { DOT_SIZE } from '../constants';
+import { ClockDialProps, MarkingType } from './types';
+export { MarkingType } from './types';
 
+const Line = ({ index }: { index: number }) =>
+    <View style={[styles.markerContainer, { transform: [{ rotate: `${index * 30}deg` }] }]}>
+        <View style={index % 3 === 0 ? styles.thickLine : styles.line} />
+    </View>;
 
-const ClockDial = ({ size }: ClockDialProps) => {
+const Number = ({ index }: { index: number }) =>
+    <View style={[styles.markerContainer, { transform: [{ rotate: `${index * 30}deg` }] }]}>
+        <Text style={[index % 3 === 0 ? styles.thickNumber : styles.number, { transform: [{ rotate: `-${index * 30}deg` }] }]}>
+            {index}
+        </Text>
+    </View>;
+
+const numbers = Array.from({ length: 12 }, (_, i) => i + 1);
+
+const ClockDial = ({ size, markingType = MarkingType.NUMBERS }: ClockDialProps) => {
+    const shouldRenderNumbers = markingType === MarkingType.NUMBERS;
+
     return (
         <View style={[styles.dial, { width: size, height: size }]}>
             <View style={styles.centerDot} />
+            {numbers.map((index) =>
+                shouldRenderNumbers
+                    ? <Number key={`number-${index}`} index={index} />
+                    : <Line key={`line-${index}`} index={index} />
+            )}
         </View>
     )
 }
@@ -28,5 +49,28 @@ const styles = StyleSheet.create({
         height: DOT_SIZE,
         borderRadius: 6,
         backgroundColor: '#1F1F1F',
+    },
+    line: {
+        width: 2, height: 10, backgroundColor: 'black'
+    },
+    thickLine: {
+        width: 4, height: 20, backgroundColor: 'black'
+    },
+    number: {
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+    thickNumber: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    markerContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'flex-start',
     },
 });
