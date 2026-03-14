@@ -1,5 +1,13 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { Timezone } from '../api/types';
+import { saveSelectedTimezone } from '../db';
+import { SQLiteDatabase } from 'react-native-sqlite-storage';
+
+interface TimezoneProviderProps {
+    children: React.ReactNode;
+    initialTimezone?: Timezone;
+    db?: SQLiteDatabase;
+}
 
 interface TimezoneContextValue {
     selectedTimezone: Timezone | undefined;
@@ -8,16 +16,16 @@ interface TimezoneContextValue {
 
 const TimezoneContext = createContext<TimezoneContextValue | undefined>(undefined);
 
-export function TimezoneProvider({ children }: { children: React.ReactNode }) {
-    const [selectedTimezone, setSelectedTimezone] = useState<Timezone | undefined>(undefined);
-
-    const value = useMemo(() => ({
-        selectedTimezone,
-        setSelectedTimezone
-    }), [selectedTimezone]);
-
+export function TimezoneProvider({ children, initialTimezone, db }: TimezoneProviderProps) {
+    const [selectedTimezone, setSelectedTimezone] = useState<Timezone | undefined>(initialTimezone);
+    const _saveSelectedTimezone = async (timezone: Timezone) => {
+        if (db) {
+            await saveSelectedTimezone(db, JSON.stringify(timezone));
+        }
+        setSelectedTimezone(timezone);
+    }
     return (
-        <TimezoneContext.Provider value={value}>
+        <TimezoneContext.Provider value={{ selectedTimezone, setSelectedTimezone: _saveSelectedTimezone }}>
             {children}
         </TimezoneContext.Provider>
     )
