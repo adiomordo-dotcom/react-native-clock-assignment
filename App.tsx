@@ -5,8 +5,7 @@
  * @format
  */
 
-import { useState } from 'react';
-import { StatusBar, StyleSheet, useColorScheme, Text } from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, Text, View } from 'react-native';
 import {
   SafeAreaProvider,
   SafeAreaView,
@@ -15,7 +14,7 @@ import useTimezones from './src/hooks/useTimezones';
 import AnalogClock from './src/components/AnalogClock';
 import TimezoneSelector from './src/components/TimezoneSelector';
 import { formatTimezoneName } from './src/utils/timezone';
-import { Timezone } from './src/api/types';
+import { TimezoneProvider, useSelectedTimezone } from './src/context/TimezoneContext';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -23,28 +22,35 @@ function App() {
   return (
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
+      <TimezoneProvider>
+        <AppContent />
+      </TimezoneProvider>
     </SafeAreaProvider>
   );
 }
 
 function AppContent() {
   const { timezones, loading } = useTimezones();
-  const [selectedTimezone, setSelectedTimezone] = useState<Timezone | undefined>(undefined);
-
-  const onTimezoneSelect = (timezone: Timezone) => {
-    setSelectedTimezone(timezone);
-  }
+  const { selectedTimezone, setSelectedTimezone } = useSelectedTimezone();
 
   return (
     <SafeAreaView style={styles.container}>
-      <AnalogClock timezone={selectedTimezone} />
-      <Text>{selectedTimezone && `${selectedTimezone.countryName} - ${formatTimezoneName(selectedTimezone.zoneName)}`}</Text>
-      <TimezoneSelector
-        timezones={timezones}
-        loading={loading}
-        onSelect={onTimezoneSelect}
-      />
+      <View style={styles.clockSection}>
+        <AnalogClock timezone={selectedTimezone} />
+        {selectedTimezone && (
+          <View style={styles.timezoneLabel}>
+            <Text style={styles.countryName}>{selectedTimezone.countryName}</Text>
+            <Text style={styles.zoneName}>{formatTimezoneName(selectedTimezone.zoneName)}</Text>
+          </View>
+        )}
+      </View>
+      <View style={styles.controlsSection}>
+        <TimezoneSelector
+          timezones={timezones}
+          loading={loading}
+          onSelect={setSelectedTimezone}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -54,6 +60,33 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  clockSection: {
+    flex: 1,                    // top half
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth * 3,
+    borderBottomColor: '#E0E0E0',
+  },
+  controlsSection: {
+    flex: 1,                    // bottom half
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    gap: 16,
+  },
+  timezoneLabel: {
+    alignItems: 'center',
+    marginVertical: 10
+  },
+  countryName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  zoneName: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
   },
 });
 

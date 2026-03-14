@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react'
 import { View, Text, Pressable, Modal, ActivityIndicator, StyleSheet } from 'react-native'
 import { TimezoneSelectorProps } from './types';
 import TimezoneList from './TimezoneList';
+import { Timezone } from '../../api/types';
 
 const ModalHeader = ({ onClose }: { onClose: () => void }) => (
     <View style={styles.header}>
@@ -30,6 +31,11 @@ function TimezoneSelector({ timezones, loading, onSelect }: TimezoneSelectorProp
         setVisible(false);
     }, []);
 
+    const onItemSelect = useCallback((timezone: Timezone) => {
+        onSelect(timezone);
+        setVisible(false);
+    }, [onSelect]);
+
     return (
         <View style={styles.container}>
             <Pressable style={styles.button} onPress={onPress}>
@@ -38,7 +44,7 @@ function TimezoneSelector({ timezones, loading, onSelect }: TimezoneSelectorProp
             <Modal visible={visible} onRequestClose={onRequestClose} animationType="slide">
                 <View style={styles.container}>
                     <ModalHeader onClose={onRequestClose} />
-                    {loading ? <LoadingComponent /> : <TimezoneList timezones={timezones} onItemSelect={onSelect} />}
+                    {loading ? <LoadingComponent /> : <TimezoneList timezones={timezones} onItemSelect={onItemSelect} />}
                 </View>
             </Modal>
         </View>
