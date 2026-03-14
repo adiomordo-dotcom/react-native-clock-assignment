@@ -1,97 +1,63 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Analog Clock App
 
-# Getting Started
+React Native CLI app displaying an analog clock with timezone support and offline persistence.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
-
-## Step 1: Start Metro
-
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
-
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Run
 
 ```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
+yarn install
 yarn android
 ```
 
-### iOS
+---
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+## Architecture
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+### Folder structure
+```
+src/
+├── api/          # Network layer (timezonedb.com fetch)
+├── components/   # UI components (AnalogClock, TimezoneSelector, OfflineBanner)
+├── context/      # TimezoneContext — shares selected timezone across the app
+├── db/           # SQLite setup + queries (timezones table, preferences table)
+├── hooks/        # useClockTime (animation loop), useTimezones (fetch + cache)
+└── utils/        # Pure functions — time math, name formatting, size ratios
 ```
 
-Then, and every time you update your native dependencies, run:
+### Key decisions
 
-```sh
-bundle exec pod install
-```
+- **Clock animation** uses `requestAnimationFrame` instead of `setInterval`. An alternative would be a 1-second `setInterval` updating state via context — simpler, but hands would jump discretely each second. rAF runs every frame (~16ms), giving smooth continuous hand movement. Elapsed time is measured from a start timestamp so floating-point errors don't accumulate over time.
+- **Timezone time** is calculated using `gmtOffset` (seconds from UTC) + UTC date getters — `Intl.DateTimeFormat` with `timeZone` returns `NaN` on Android's.
+- **Selected timezone** is managed via React Context. The context's setter wraps the SQLite save so any consumer just calls `setSelectedTimezone` — persistence is transparent.
+- **Business logic is separated from UI** — components receive data via props/context and only render. Hooks and utils handle all logic.
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+---
 
-```sh
-# Using npm
-npm run ios
+## Offline Caching
 
-# OR using Yarn
-yarn ios
-```
+Two SQLite tables:
+- `Timezones` — cached API response (used when offline)
+- `Preferences` — key/value store for the selected timezone
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Flow
+1. Check connectivity via `@react-native-community/netinfo`
+2. **Online** → fetch from API → show list → cache to SQLite
+3. **Offline** → load directly from SQLite (no waiting for API timeout)
+4. **API error** → fall back to SQLite cache as last resort
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### Selected timezone persistence
+Saved as `JSON.stringify(timezone)` on selection. On next launch, loaded and parsed back, then passed as the initial context value.
 
-## Step 3: Modify your app
+### Cache failure handling
+`try/finally` in app init ensures the app always unblocks even if the DB fails — it launches with local time and no pre-selected timezone instead of getting stuck on a loading screen.
 
-Now that you have successfully run the app, let's make changes!
+---
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+## Assumptions & Trade-offs
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- `gmtOffset` used for time math instead of `Intl` API — `Intl.DateTimeFormat` returns `NaN` on Android Hermes
+- When no timezone is selected the clock shows the device's local time (default behavior)
+- Timezone list is fetched once per launch — zones rarely change, keeps the logic simple
+- API key is gitignored — fine for assignment scope
+- No iOS build — no Mac available
+- UI settings (hand visibility, marker type) are not persisted — the infrastructure supports it but it's out of scope for the core requirements
