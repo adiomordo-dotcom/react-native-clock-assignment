@@ -4,4 +4,6 @@ import { Timezone } from '../../api/types';
 export type AnalogClockProps = {
     markingType?: MarkingType;
     timezone: Timezone | undefined;
+    showMinuteHand?: boolean;
+    showSecondHand?: boolean;
 }

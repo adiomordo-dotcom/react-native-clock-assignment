@@ -5,13 +5,13 @@
  * @format
  */
 import React, { useCallback, useEffect, useState } from 'react';
-import { StatusBar, StyleSheet, useColorScheme, Text, View, ActivityIndicator } from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, Text, View, ActivityIndicator, Switch } from 'react-native';
 import {
   SafeAreaProvider,
   SafeAreaView,
 } from 'react-native-safe-area-context';
 import useTimezones from './src/hooks/useTimezones';
-import AnalogClock from './src/components/AnalogClock';
+import AnalogClock, { MarkingType } from './src/components/AnalogClock';
 import TimezoneSelector from './src/components/TimezoneSelector';
 import OfflineBanner from './src/components/OfflineBanner/offlineBanner';
 import { formatTimezoneName } from './src/utils/timezone';
@@ -71,11 +71,34 @@ function App() {
 function AppContent({ db }: { db?: SQLiteDatabase }) {
   const { timezones, loading } = useTimezones(db);
   const { selectedTimezone, setSelectedTimezone } = useSelectedTimezone();
+  const [markingType, setMarkingType] = useState<MarkingType>(MarkingType.NUMBERS);
+  const [showMinuteHand, setShowMinuteHand] = useState(true);
+  const [showSecondHand, setShowSecondHand] = useState(true);
+
+  const SettingRow = ({ label, value, onChange }: { label: string, value: boolean, onChange: (value: boolean) => void }) => {
+    return (
+      <View style={styles.settingRow}>
+        <Text>{label}</Text>
+        <Switch value={value} onValueChange={onChange} />
+      </View>
+    )
+  }
+
+  const SeetingsPanel = () => {
+    return (
+      <View style={styles.settingContainer}>
+        <Text style={styles.settingTitle}>Settings</Text>
+        <SettingRow label="Markers - Numbers" value={markingType === MarkingType.NUMBERS} onChange={(val) => setMarkingType(val ? MarkingType.NUMBERS : MarkingType.LINES)} />
+        <SettingRow label="Show Minute Hand" value={showMinuteHand} onChange={(val) => setShowMinuteHand(val)} />
+        <SettingRow label="Show Second Hand" value={showSecondHand} onChange={(val) => setShowSecondHand(val)} />
+      </View>
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.clockSection}>
-        <AnalogClock timezone={selectedTimezone} />
+        <AnalogClock timezone={selectedTimezone} markingType={markingType} showMinuteHand={showMinuteHand} showSecondHand={showSecondHand} />
         <View style={styles.timezoneLabel}>
           <Text style={styles.countryName}>
             {selectedTimezone ? selectedTimezone.countryName : 'Local Time'}
@@ -93,6 +116,7 @@ function AppContent({ db }: { db?: SQLiteDatabase }) {
           loading={loading}
           onSelect={setSelectedTimezone}
         />
+        <SeetingsPanel />
       </View>
       <OfflineBanner />
     </SafeAreaView>
@@ -117,7 +141,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    gap: 16,
+
   },
   timezoneLabel: {
     alignItems: 'center',
@@ -131,6 +155,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginTop: 4,
+  },
+  settingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+  },
+  settingContainer: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    padding: 10,
+  },
+  settingTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
   },
 });
 
