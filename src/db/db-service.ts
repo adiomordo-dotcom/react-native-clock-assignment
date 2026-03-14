@@ -18,9 +18,7 @@ const getDBConnection = async () => {
 };
 
 export const initDB = async () => {
-    console.log('Initializing database...');
     const db = await getDBConnection();
-    console.log('Database connection established');
     await createTables(db);
     return db;
 };
@@ -47,7 +45,6 @@ const createTables = async (db: SQLiteDatabase) => {
     try {
         await db.executeSql(timezonesQuery)
         await db.executeSql(preferencesQuery)
-        console.log('Tables created successfully');
     } catch (error) {
         console.error(error);
         throw Error('Failed to create tables');

@@ -20,6 +20,12 @@ import { initDB, getSelectedTimezone } from './src/db';
 import { Timezone } from './src/api/types';
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
 
+interface ClockSettings {
+  markingType: MarkingType;
+  showMinuteHand: boolean;
+  showSecondHand: boolean;
+}
+
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
   const [isDbReady, setIsDbReady] = useState(false);
@@ -68,37 +74,46 @@ function App() {
   );
 }
 
+
+const SettingRow = ({ label, value, onChange }: { label: string, value: boolean, onChange: (value: boolean) => void }) => {
+  return (
+    <View style={styles.settingRow}>
+      <Text>{label}</Text>
+      <Switch value={value} onValueChange={onChange} />
+    </View>
+  )
+}
+
+const SettingsPanel = ({ settings, onChange }: { settings: ClockSettings, onChange: (settings: ClockSettings) => void }) => {
+  return (
+    <View style={styles.settingContainer}>
+      <Text style={styles.settingTitle}>Settings</Text>
+      <SettingRow label="Markers - Numbers" value={settings.markingType === MarkingType.NUMBERS} onChange={(val) => onChange({ ...settings, markingType: val ? MarkingType.NUMBERS : MarkingType.LINES })} />
+      <SettingRow label="Show Minute Hand" value={settings.showMinuteHand} onChange={(val) => onChange({ ...settings, showMinuteHand: val })} />
+      <SettingRow label="Show Second Hand" value={settings.showSecondHand} onChange={(val) => onChange({ ...settings, showSecondHand: val })} />
+    </View>
+  )
+}
+
 function AppContent({ db }: { db?: SQLiteDatabase }) {
   const { timezones, loading } = useTimezones(db);
   const { selectedTimezone, setSelectedTimezone } = useSelectedTimezone();
-  const [markingType, setMarkingType] = useState<MarkingType>(MarkingType.NUMBERS);
-  const [showMinuteHand, setShowMinuteHand] = useState(true);
-  const [showSecondHand, setShowSecondHand] = useState(true);
+  const [clockSettings, setClockSettings] = useState({
+    markingType: MarkingType.NUMBERS,
+    showMinuteHand: true,
+    showSecondHand: true,
+  });
 
-  const SettingRow = ({ label, value, onChange }: { label: string, value: boolean, onChange: (value: boolean) => void }) => {
-    return (
-      <View style={styles.settingRow}>
-        <Text>{label}</Text>
-        <Switch value={value} onValueChange={onChange} />
-      </View>
-    )
-  }
-
-  const SeetingsPanel = () => {
-    return (
-      <View style={styles.settingContainer}>
-        <Text style={styles.settingTitle}>Settings</Text>
-        <SettingRow label="Markers - Numbers" value={markingType === MarkingType.NUMBERS} onChange={(val) => setMarkingType(val ? MarkingType.NUMBERS : MarkingType.LINES)} />
-        <SettingRow label="Show Minute Hand" value={showMinuteHand} onChange={(val) => setShowMinuteHand(val)} />
-        <SettingRow label="Show Second Hand" value={showSecondHand} onChange={(val) => setShowSecondHand(val)} />
-      </View>
-    )
-  }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.clockSection}>
-        <AnalogClock timezone={selectedTimezone} markingType={markingType} showMinuteHand={showMinuteHand} showSecondHand={showSecondHand} />
+        <AnalogClock
+          timezone={selectedTimezone}
+          markingType={clockSettings.markingType}
+          showMinuteHand={clockSettings.showMinuteHand}
+          showSecondHand={clockSettings.showSecondHand}
+        />
         <View style={styles.timezoneLabel}>
           <Text style={styles.countryName}>
             {selectedTimezone ? selectedTimezone.countryName : 'Local Time'}
@@ -116,7 +131,7 @@ function AppContent({ db }: { db?: SQLiteDatabase }) {
           loading={loading}
           onSelect={setSelectedTimezone}
         />
-        <SeetingsPanel />
+        <SettingsPanel settings={clockSettings} onChange={setClockSettings} />
       </View>
       <OfflineBanner />
     </SafeAreaView>

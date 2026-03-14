@@ -12,6 +12,7 @@ function OfflineBanner() {
             </SafeAreaView>
         );
     }
+    return null;
 }
 
 export default OfflineBanner;
