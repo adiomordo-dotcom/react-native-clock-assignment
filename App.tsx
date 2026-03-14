@@ -9,9 +9,11 @@ import { NewAppScreen } from '@react-native/new-app-screen';
 import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import {
   SafeAreaProvider,
-  useSafeAreaInsets,
+  SafeAreaView,
 } from 'react-native-safe-area-context';
+import useTimezones from './src/hooks/useTimezones';
 import AnalogClock from './src/components/AnalogClock';
+import TimezoneSelector from './src/components/TimezoneSelector';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -25,12 +27,13 @@ function App() {
 }
 
 function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
+  const { timezones, loading } = useTimezones();
 
   return (
-    <View style={styles.container}>
-     <AnalogClock />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <AnalogClock />
+      <TimezoneSelector timezones={timezones} loading={loading} />
+    </SafeAreaView>
   );
 }
 

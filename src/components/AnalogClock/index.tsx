@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
-import { CLOCK_SIZE } from '../constants';
+import { CLOCK_SIZE } from '../../constants';
 import { useClockTime } from '../../hooks/useClockTime ';
 import ClockDial, { MarkingType } from '../ClockDial';
 import ClockHand, { HandType } from '../ClockHand';
@@ -27,5 +27,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
+        flex: 1
     }
 });

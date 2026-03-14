@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { DOT_SIZE } from '../constants';
+import { DOT_SIZE } from '../../constants';
 import { ClockDialProps, MarkingType } from './types';
 export { MarkingType } from './types';
 
