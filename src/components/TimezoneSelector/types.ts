@@ -1,4 +1,5 @@
 import { Timezone } from '../../api/types';
+export type { Timezone };
 
 export interface TimezoneItemProps {
     timezone: Timezone;
