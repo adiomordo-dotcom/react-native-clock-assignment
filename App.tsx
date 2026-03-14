@@ -37,12 +37,16 @@ function AppContent() {
     <SafeAreaView style={styles.container}>
       <View style={styles.clockSection}>
         <AnalogClock timezone={selectedTimezone} />
-        {selectedTimezone && (
-          <View style={styles.timezoneLabel}>
-            <Text style={styles.countryName}>{selectedTimezone.countryName}</Text>
-            <Text style={styles.zoneName}>{formatTimezoneName(selectedTimezone.zoneName)}</Text>
-          </View>
-        )}
+        <View style={styles.timezoneLabel}>
+          <Text style={styles.countryName}>
+            {selectedTimezone ? selectedTimezone.countryName : 'Local Time'}
+          </Text>
+          <Text style={styles.zoneName}>
+            {selectedTimezone
+              ? formatTimezoneName(selectedTimezone.zoneName)
+              : Intl.DateTimeFormat().resolvedOptions().timeZone}
+          </Text>
+        </View>
       </View>
       <View style={styles.controlsSection}>
         <TimezoneSelector

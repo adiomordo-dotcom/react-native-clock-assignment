@@ -1,6 +1,5 @@
 import React from 'react'
-import { View, StyleSheet } from 'react-native'
-import { CLOCK_SIZE } from '../../constants';
+import { View, StyleSheet, useWindowDimensions } from 'react-native'
 import { useClockTime } from '../../hooks/useClockTime ';
 import ClockDial, { MarkingType } from '../ClockDial';
 import ClockHand, { HandType } from '../ClockHand';
@@ -9,12 +8,15 @@ export { MarkingType } from '../ClockDial';
 
 const AnalogClock = ({ markingType = MarkingType.NUMBERS, timezone }: AnalogClockProps) => {
     const { secondValue, minuteValue, hourValue } = useClockTime(timezone);
+    const { width, height } = useWindowDimensions();
+    const clockSize = Math.min(width, height) * 0.7;
+
     return (
         <View style={styles.container}>
-            <ClockDial size={CLOCK_SIZE} markingType={markingType} />
-            <ClockHand clockSize={CLOCK_SIZE} value={hourValue} handType={HandType.HOUR} />
-            <ClockHand clockSize={CLOCK_SIZE} value={minuteValue} handType={HandType.MINUTE} />
-            <ClockHand clockSize={CLOCK_SIZE} value={secondValue} handType={HandType.SECOND} />
+            <ClockDial size={clockSize} markingType={markingType} />
+            <ClockHand clockSize={clockSize} value={hourValue} handType={HandType.HOUR} />
+            <ClockHand clockSize={clockSize} value={minuteValue} handType={HandType.MINUTE} />
+            <ClockHand clockSize={clockSize} value={secondValue} handType={HandType.SECOND} />
         </View>
     )
 }

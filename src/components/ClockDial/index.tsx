@@ -1,8 +1,8 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { DOT_SIZE } from '../../constants';
 import { ClockDialProps, MarkingType } from './types';
 export { MarkingType } from './types';
+import { getClockSizes } from '../../utils/clockSizes';
 
 const Line = ({ index }: { index: number }) =>
     <View style={[styles.markerContainer, { transform: [{ rotate: `${index * 30}deg` }] }]}>
@@ -20,10 +20,11 @@ const numbers = Array.from({ length: 12 }, (_, i) => i + 1);
 
 const ClockDial = ({ size, markingType = MarkingType.NUMBERS }: ClockDialProps) => {
     const shouldRenderNumbers = markingType === MarkingType.NUMBERS;
+    const { dotSize } = getClockSizes(size);
 
     return (
-        <View style={[styles.dial, { width: size, height: size }]}>
-            <View style={styles.centerDot} />
+        <View style={[styles.dial, { width: size, height: size, borderRadius: size / 2 }]}>
+            <View style={[styles.centerDot, { width: dotSize, height: dotSize, borderRadius: dotSize / 2 }]} />
             {numbers.map((index) =>
                 shouldRenderNumbers
                     ? <Number key={`number-${index}`} index={index} />
@@ -42,12 +43,8 @@ const styles = StyleSheet.create({
         borderColor: '#1F1F1F',
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 100
     },
     centerDot: {
-        width: DOT_SIZE,
-        height: DOT_SIZE,
-        borderRadius: 6,
         backgroundColor: '#1F1F1F',
     },
     line: {

@@ -39,7 +39,7 @@ function TimezoneSelector({ timezones, loading, onSelect }: TimezoneSelectorProp
     return (
         <View style={styles.container}>
             <Pressable style={styles.button} onPress={onPress}>
-                <Text style={styles.buttonText}>TimezoneSelector</Text>
+                <Text style={styles.buttonText}>Timezone Selector</Text>
             </Pressable>
             <Modal visible={visible} onRequestClose={onRequestClose} animationType="slide">
                 <View style={styles.container}>
