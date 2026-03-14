@@ -7,9 +7,8 @@ import ClockHand, { HandType } from '../ClockHand';
 import { AnalogClockProps } from './types';
 export { MarkingType } from '../ClockDial';
 
-const AnalogClock = ({ markingType = MarkingType.NUMBERS }: AnalogClockProps) => {
-    const { secondValue, minuteValue, hourValue } = useClockTime();
-
+const AnalogClock = ({ markingType = MarkingType.NUMBERS, timezone }: AnalogClockProps) => {
+    const { secondValue, minuteValue, hourValue } = useClockTime(timezone);
     return (
         <View style={styles.container}>
             <ClockDial size={CLOCK_SIZE} markingType={markingType} />

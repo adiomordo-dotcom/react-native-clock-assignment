@@ -1,17 +1,24 @@
 import { useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
 import { getInitialTime } from '../utils/time';
+import { Timezone } from '../api/types';
 
-export const useClockTime = () => {
-    const { initialSeconds, initialMinutes, initialHours } = getInitialTime();
-    const secondValue = useRef<Animated.Value>(new Animated.Value(initialSeconds)).current;
-    const minuteValue = useRef<Animated.Value>(new Animated.Value(initialMinutes)).current;
-    const hourValue = useRef<Animated.Value>(new Animated.Value(initialHours)).current;
+export const useClockTime = (timezone: Timezone | undefined) => {
+    const secondValue = useRef(new Animated.Value(0)).current;
+    const minuteValue = useRef(new Animated.Value(0)).current;
+    const hourValue = useRef(new Animated.Value(0)).current;
 
     const requestRef = useRef<number | null>(null);
     const startTimeRef = useRef<number | null>(null);
 
     useEffect(() => {
+        const { initialSeconds, initialMinutes, initialHours } = getInitialTime(timezone);
+        secondValue.setValue(initialSeconds);
+        minuteValue.setValue(initialMinutes);
+        hourValue.setValue(initialHours);
+
+        startTimeRef.current = null;
+
         const animate = (timestamp: number) => {
             if (startTimeRef.current === null) {
                 startTimeRef.current = timestamp;
@@ -31,7 +38,7 @@ export const useClockTime = () => {
         return () => {
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
         };
-    }, []);
+    }, [timezone]);
 
     return {
         secondValue,

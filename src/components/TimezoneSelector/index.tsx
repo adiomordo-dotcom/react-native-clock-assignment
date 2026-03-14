@@ -19,7 +19,7 @@ const LoadingComponent = () => (
     </View>
 );
 
-function TimezoneSelector({ timezones, loading }: TimezoneSelectorProps) {
+function TimezoneSelector({ timezones, loading, onSelect }: TimezoneSelectorProps) {
     const [visible, setVisible] = useState(false);
 
     const onPress = useCallback(() => {
@@ -38,7 +38,7 @@ function TimezoneSelector({ timezones, loading }: TimezoneSelectorProps) {
             <Modal visible={visible} onRequestClose={onRequestClose} animationType="slide">
                 <View style={styles.container}>
                     <ModalHeader onClose={onRequestClose} />
-                    {loading ? <LoadingComponent /> : <TimezoneList timezones={timezones} />}
+                    {loading ? <LoadingComponent /> : <TimezoneList timezones={timezones} onItemSelect={onSelect} />}
                 </View>
             </Modal>
         </View>

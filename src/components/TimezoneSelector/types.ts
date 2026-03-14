@@ -1,10 +1,4 @@
-export interface Timezone {
-    countryCode: string;
-    countryName: string;
-    zoneName: string;
-    gmtOffset: number;
-    timestamp: number;
-}
+import { Timezone } from '../../api/types';
 
 export interface TimezoneItemProps {
     timezone: Timezone;
@@ -14,4 +8,10 @@ export interface TimezoneItemProps {
 export interface TimezoneSelectorProps {
     timezones: Timezone[];
     loading: boolean;
+    onSelect: (timezone: Timezone) => void;
+}
+
+export interface TimezoneListProps {
+    timezones: Timezone[];
+    onItemSelect: (timezone: Timezone) => void;
 }

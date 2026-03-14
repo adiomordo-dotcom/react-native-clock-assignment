@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react'
 import { FlatList, StyleSheet } from 'react-native';
 import TimezoneItem from './TimezoneItem';
-import { Timezone } from './types';
+import { Timezone, TimezoneListProps } from './types';
 import { ITEM_HEIGHT } from '../../constants';
 
-function TimezoneList({ timezones }: { timezones: Timezone[] }) {
+function TimezoneList({ timezones, onItemSelect }: TimezoneListProps) {
 
     const getItemLayout = useCallback((_: any, index: number) => ({
         length: ITEM_HEIGHT,
@@ -12,13 +12,9 @@ function TimezoneList({ timezones }: { timezones: Timezone[] }) {
         index,
     }), []);
 
-    const onSelect = useCallback((timezone: Timezone) => {
-        console.log('timezone', timezone);
-    }, []);
-
     const renderItem = useCallback(({ item }: { item: Timezone }) => (
-        <TimezoneItem timezone={item} onSelect={onSelect} />
-    ), [onSelect])
+        <TimezoneItem timezone={item} onSelect={() => onItemSelect(item)} />
+    ), [onItemSelect])
 
     return (
         <FlatList

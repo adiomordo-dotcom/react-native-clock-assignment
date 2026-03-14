@@ -5,8 +5,8 @@
  * @format
  */
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import { useState } from 'react';
+import { StatusBar, StyleSheet, useColorScheme, Text } from 'react-native';
 import {
   SafeAreaProvider,
   SafeAreaView,
@@ -14,6 +14,8 @@ import {
 import useTimezones from './src/hooks/useTimezones';
 import AnalogClock from './src/components/AnalogClock';
 import TimezoneSelector from './src/components/TimezoneSelector';
+import { formatTimezoneName } from './src/utils/timezone';
+import { Timezone } from './src/api/types';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -28,11 +30,21 @@ function App() {
 
 function AppContent() {
   const { timezones, loading } = useTimezones();
+  const [selectedTimezone, setSelectedTimezone] = useState<Timezone | undefined>(undefined);
+
+  const onTimezoneSelect = (timezone: Timezone) => {
+    setSelectedTimezone(timezone);
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <AnalogClock />
-      <TimezoneSelector timezones={timezones} loading={loading} />
+      <AnalogClock timezone={selectedTimezone} />
+      <Text>{selectedTimezone && `${selectedTimezone.countryName} - ${formatTimezoneName(selectedTimezone.zoneName)}`}</Text>
+      <TimezoneSelector
+        timezones={timezones}
+        loading={loading}
+        onSelect={onTimezoneSelect}
+      />
     </SafeAreaView>
   );
 }
