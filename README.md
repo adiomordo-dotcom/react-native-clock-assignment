@@ -4,6 +4,15 @@ React Native CLI app displaying an analog clock with timezone support and offlin
 
 ## Run
 
+**1. Create the API key file** (gitignored — not included in the repo):
+
+```sh
+# src/constants/api.ts
+export const API_URL = 'http://api.timezonedb.com/v2.1';
+export const API_KEY = 'YOUR_KEY_HERE'; # get a free key at https://timezonedb.com/register
+```
+
+**2. Install and run:**
 ```sh
 yarn install
 yarn android

@@ -20,7 +20,11 @@ export function TimezoneProvider({ children, initialTimezone, db }: TimezoneProv
     const [selectedTimezone, setSelectedTimezone] = useState<Timezone | undefined>(initialTimezone);
     const _saveSelectedTimezone = async (timezone: Timezone) => {
         if (db) {
-            await saveSelectedTimezone(db, JSON.stringify(timezone));
+            try {
+                await saveSelectedTimezone(db, JSON.stringify(timezone));
+            } catch (error) {
+                console.error('Error saving selected timezone:', error);
+            }
         }
         setSelectedTimezone(timezone);
     }

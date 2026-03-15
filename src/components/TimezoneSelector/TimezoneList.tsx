@@ -17,7 +17,7 @@ function TimezoneList({ timezones, onItemSelect }: TimezoneListProps) {
         [timezones, query]
     );
 
-    const getItemLayout = useCallback((_: any, index: number) => ({
+    const getItemLayout = useCallback((_: ArrayLike<Timezone> | null | undefined, index: number) => ({
         length: ITEM_HEIGHT,
         offset: ITEM_HEIGHT * index,
         index,
