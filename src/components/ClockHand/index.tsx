@@ -4,7 +4,6 @@ import { ClockHandProps, HAND_RANGE, HandType } from './types';
 import { getHandSizes } from '../../utils/clockSizes';
 export { HandType } from './types';
 
-const HAND_SIZE = 3;
 export const HAND_COLOR: Record<HandType, string> = {
     [HandType.HOUR]: '#212121',
     [HandType.MINUTE]: '#1565C0',
@@ -41,7 +40,6 @@ const styles = StyleSheet.create({
         bottom: '50%',
         backgroundColor: '#1F1F1F',
         borderRadius: 6,
-        width: HAND_SIZE,
         transformOrigin: 'bottom'
     },
 });

@@ -5,7 +5,7 @@
  * @format
  */
 import React, { useCallback, useEffect, useState } from 'react';
-import { StatusBar, StyleSheet, useColorScheme, Text, View, ActivityIndicator, Switch } from 'react-native';
+import { StatusBar, StyleSheet, Text, View, ActivityIndicator, Switch } from 'react-native';
 import {
   SafeAreaProvider,
   SafeAreaView,
@@ -27,7 +27,6 @@ interface ClockSettings {
 }
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
   const [isDbReady, setIsDbReady] = useState(false);
   const [db, setDb] = useState<SQLiteDatabase | undefined>(undefined);
   const [initialTimezone, setInitialTimezone] = useState<Timezone | undefined>(undefined);
@@ -66,7 +65,7 @@ function App() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar />
       <TimezoneProvider db={db} initialTimezone={initialTimezone} >
         <AppContent db={db} />
       </TimezoneProvider>
