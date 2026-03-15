@@ -5,7 +5,7 @@
  * @format
  */
 import React, { useCallback, useEffect, useState } from 'react';
-import { StatusBar, StyleSheet, Text, View, ActivityIndicator, Switch } from 'react-native';
+import { StatusBar, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import {
   SafeAreaProvider,
   SafeAreaView,
@@ -14,17 +14,12 @@ import { useTimezones } from './src/hooks';
 import AnalogClock, { MarkingType } from './src/components/AnalogClock';
 import TimezoneSelector from './src/components/TimezoneSelector';
 import OfflineBanner from './src/components/OfflineBanner/offlineBanner';
+import ClockSettingsPanel from './src/components/ClockSettings';
 import { formatTimezoneName } from './src/utils/timezone';
 import { TimezoneProvider, useSelectedTimezone } from './src/context/TimezoneContext';
 import { initDB, getSelectedTimezone } from './src/db';
 import { Timezone } from './src/api/types';
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
-
-interface ClockSettings {
-  markingType: MarkingType;
-  showMinuteHand: boolean;
-  showSecondHand: boolean;
-}
 
 function App() {
   const [isDbReady, setIsDbReady] = useState(false);
@@ -74,26 +69,6 @@ function App() {
 }
 
 
-const SettingRow = ({ label, value, onChange }: { label: string, value: boolean, onChange: (value: boolean) => void }) => {
-  return (
-    <View style={styles.settingRow}>
-      <Text>{label}</Text>
-      <Switch value={value} onValueChange={onChange} />
-    </View>
-  )
-}
-
-const SettingsPanel = ({ settings, onChange }: { settings: ClockSettings, onChange: (settings: ClockSettings) => void }) => {
-  return (
-    <View style={styles.settingContainer}>
-      <Text style={styles.settingTitle}>Settings</Text>
-      <SettingRow label="Markers - Numbers" value={settings.markingType === MarkingType.NUMBERS} onChange={(val) => onChange({ ...settings, markingType: val ? MarkingType.NUMBERS : MarkingType.LINES })} />
-      <SettingRow label="Show Minute Hand" value={settings.showMinuteHand} onChange={(val) => onChange({ ...settings, showMinuteHand: val })} />
-      <SettingRow label="Show Second Hand" value={settings.showSecondHand} onChange={(val) => onChange({ ...settings, showSecondHand: val })} />
-    </View>
-  )
-}
-
 function AppContent({ db }: { db?: SQLiteDatabase }) {
   const { timezones, loading } = useTimezones(db);
   const { selectedTimezone, setSelectedTimezone } = useSelectedTimezone();
@@ -130,7 +105,7 @@ function AppContent({ db }: { db?: SQLiteDatabase }) {
           loading={loading}
           onSelect={setSelectedTimezone}
         />
-        <SettingsPanel settings={clockSettings} onChange={setClockSettings} />
+        <ClockSettingsPanel settings={clockSettings} onChange={setClockSettings} />
       </View>
       <OfflineBanner />
     </SafeAreaView>
@@ -169,24 +144,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginTop: 4,
-  },
-  settingRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 10,
-  },
-  settingContainer: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
-    padding: 10,
-  },
-  settingTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
   },
 });
 
