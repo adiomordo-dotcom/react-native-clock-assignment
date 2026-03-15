@@ -5,7 +5,7 @@
  * @format
  */
 import React, { useState } from 'react';
-import { StatusBar, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import { StatusBar, StyleSheet, Text, View, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useTimezones } from './src/hooks';
 import { AnalogClock, MarkingType, ClockSettingsPanel, TimezoneSelector, OfflineBanner } from './src/components';
@@ -35,6 +35,9 @@ function AppContent() {
     showSecondHand: true,
   });
 
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
+
   if (!isReady) {
     return (
       <SafeAreaView style={styles.container}>
@@ -45,8 +48,8 @@ function AppContent() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.clockSection}>
+    <SafeAreaView style={[styles.container, isLandscape && styles.containerLandscape]}>
+      <View style={[styles.clockSection, isLandscape && styles.clockSectionLandscape]}>
         <AnalogClock
           timezone={selectedTimezone}
           markingType={clockSettings.markingType}
@@ -83,12 +86,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  containerLandscape: {
+    flexDirection: 'row',
+  },
   clockSection: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomWidth: StyleSheet.hairlineWidth * 3,
     borderBottomColor: '#E0E0E0',
+  },
+  clockSectionLandscape: {
+    borderBottomWidth: 0,
+    borderRightWidth: StyleSheet.hairlineWidth * 3,
+    borderRightColor: '#E0E0E0',
   },
   controlsSection: {
     flex: 1,
