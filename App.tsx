@@ -10,7 +10,7 @@ import {
   SafeAreaProvider,
   SafeAreaView,
 } from 'react-native-safe-area-context';
-import useTimezones from './src/hooks/useTimezones';
+import { useTimezones } from './src/hooks';
 import AnalogClock, { MarkingType } from './src/components/AnalogClock';
 import TimezoneSelector from './src/components/TimezoneSelector';
 import OfflineBanner from './src/components/OfflineBanner/offlineBanner';

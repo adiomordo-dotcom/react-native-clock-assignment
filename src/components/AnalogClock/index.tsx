@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, StyleSheet, useWindowDimensions } from 'react-native'
-import { useClockTime } from '../../hooks/useClockTime ';
+import { useClockTime } from '../../hooks';
 import ClockDial, { MarkingType } from '../ClockDial';
 import ClockHand, { HandType } from '../ClockHand';
 import { AnalogClockProps } from './types';

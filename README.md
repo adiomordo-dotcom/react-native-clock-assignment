@@ -61,3 +61,4 @@ Saved as `JSON.stringify(timezone)` on selection. On next launch, loaded and par
 - API key is gitignored — fine for assignment scope
 - No iOS build — no Mac available
 - UI settings (hand visibility, marker type) are not persisted — the infrastructure supports it but it's out of scope for the core requirements
+- SQLite `Timezones` table stores only `zoneName`, `countryName`, and `gmtOffset` — `countryCode` and `timestamp` from the API are intentionally omitted as they are not used anywhere in the app
