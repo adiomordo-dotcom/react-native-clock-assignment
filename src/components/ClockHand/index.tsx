@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Animated, StyleSheet } from 'react-native'
 import { ClockHandProps, HAND_RANGE, HandType } from './types';
-import { getHandSizes } from '../../utils/clockSizes';
+import { clockSizesUtils } from '../../utils';
 export { HandType } from './types';
 
 export const HAND_COLOR: Record<HandType, string> = {
@@ -11,7 +11,7 @@ export const HAND_COLOR: Record<HandType, string> = {
 };
 
 const ClockHand = ({ clockSize, value, handType }: ClockHandProps) => {
-    const { width, length } = getHandSizes(clockSize, handType);
+    const { width, length } = clockSizesUtils.getHandSizes(clockSize, handType);
     const rotation = value.interpolate({
         inputRange: [0, HAND_RANGE[handType]],
         outputRange: ['0deg', '360deg'],

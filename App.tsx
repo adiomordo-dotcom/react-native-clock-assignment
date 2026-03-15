@@ -8,11 +8,8 @@ import React, { useState } from 'react';
 import { StatusBar, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useTimezones } from './src/hooks';
-import AnalogClock, { MarkingType } from './src/components/AnalogClock';
-import TimezoneSelector from './src/components/TimezoneSelector';
-import OfflineBanner from './src/components/OfflineBanner/offlineBanner';
-import ClockSettingsPanel from './src/components/ClockSettings';
-import { formatTimezoneName } from './src/utils/timezone';
+import { AnalogClock, MarkingType, ClockSettingsPanel, TimezoneSelector, OfflineBanner } from './src/components';
+import { timezoneUtils } from './src/utils';
 import { DbProvider, TimezoneProvider, useSelectedTimezone, useDb } from './src/context';
 
 function App() {
@@ -62,7 +59,7 @@ function AppContent() {
           </Text>
           <Text style={styles.zoneName}>
             {selectedTimezone
-              ? formatTimezoneName(selectedTimezone.zoneName)
+              ? timezoneUtils.formatTimezoneName(selectedTimezone.zoneName)
               : Intl.DateTimeFormat().resolvedOptions().timeZone}
           </Text>
         </View>

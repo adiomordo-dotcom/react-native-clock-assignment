@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
-import { getInitialTime } from '../utils/time';
+import { timeUtils } from '../utils';
 import { Timezone } from '../api/types';
 
 export const useClockTime = (timezone: Timezone | undefined) => {
@@ -12,7 +12,7 @@ export const useClockTime = (timezone: Timezone | undefined) => {
     const startTimeRef = useRef<number | null>(null);
 
     useEffect(() => {
-        const { initialSeconds, initialMinutes, initialHours } = getInitialTime(timezone);
+        const { initialSeconds, initialMinutes, initialHours } = timeUtils.getInitialTime(timezone);
         secondValue.setValue(initialSeconds);
         minuteValue.setValue(initialMinutes);
         hourValue.setValue(initialHours);

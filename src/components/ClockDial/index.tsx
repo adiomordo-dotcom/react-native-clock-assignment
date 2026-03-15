@@ -2,7 +2,7 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { ClockDialProps, MarkingType } from './types';
 export { MarkingType } from './types';
-import { getClockSizes } from '../../utils/clockSizes';
+import { clockSizesUtils } from '../../utils';
 
 const Line = ({ index }: { index: number }) =>
     <View style={[styles.markerContainer, { transform: [{ rotate: `${index * 30}deg` }] }]}>
@@ -20,7 +20,7 @@ const numbers = Array.from({ length: 12 }, (_, i) => i + 1);
 
 const ClockDial = ({ size, markingType = MarkingType.NUMBERS }: ClockDialProps) => {
     const shouldRenderNumbers = markingType === MarkingType.NUMBERS;
-    const { dotSize } = getClockSizes(size);
+    const { dotSize } = clockSizesUtils.getClockSizes(size);
 
     return (
         <View style={[styles.dial, { width: size, height: size, borderRadius: size / 2 }]}>
