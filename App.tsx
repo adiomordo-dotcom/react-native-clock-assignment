@@ -4,73 +4,33 @@
  *
  * @format
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { StatusBar, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
-import {
-  SafeAreaProvider,
-  SafeAreaView,
-} from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useTimezones } from './src/hooks';
 import AnalogClock, { MarkingType } from './src/components/AnalogClock';
 import TimezoneSelector from './src/components/TimezoneSelector';
 import OfflineBanner from './src/components/OfflineBanner/offlineBanner';
 import ClockSettingsPanel from './src/components/ClockSettings';
 import { formatTimezoneName } from './src/utils/timezone';
-import { TimezoneProvider, useSelectedTimezone } from './src/context/TimezoneContext';
-import { initDB, getSelectedTimezone } from './src/db';
-import { Timezone } from './src/api/types';
-import { SQLiteDatabase } from 'react-native-sqlite-storage';
+import { DbProvider, TimezoneProvider, useSelectedTimezone, useDb } from './src/context';
 
 function App() {
-  const [isDbReady, setIsDbReady] = useState(false);
-  const [db, setDb] = useState<SQLiteDatabase | undefined>(undefined);
-  const [initialTimezone, setInitialTimezone] = useState<Timezone | undefined>(undefined);
-
-  const loadData = useCallback(async () => {
-    try {
-      const db = await initDB()
-      setDb(db);
-      const raw = await getSelectedTimezone(db);
-      const savedTimezone = raw ? JSON.parse(raw) as Timezone : undefined;
-      if (savedTimezone) {
-        setInitialTimezone(savedTimezone);
-      }
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setIsDbReady(true)
-    }
-  }, [])
-
-  useEffect(() => {
-    loadData()
-  }, [loadData])
-
-
-  if (!isDbReady) {
-    return (
-      <SafeAreaProvider>
-        <SafeAreaView style={styles.container}>
-          <ActivityIndicator size="large" />
-          <Text>Loading...</Text>
-        </SafeAreaView>
-      </SafeAreaProvider >
-    );
-  }
-
   return (
     <SafeAreaProvider>
       <StatusBar />
-      <TimezoneProvider db={db} initialTimezone={initialTimezone} >
-        <AppContent db={db} />
-      </TimezoneProvider>
+      <DbProvider>
+        <TimezoneProvider>
+          <AppContent />
+        </TimezoneProvider>
+      </DbProvider>
     </SafeAreaProvider>
   );
 }
 
-
-function AppContent({ db }: { db?: SQLiteDatabase }) {
-  const { timezones, loading } = useTimezones(db);
+function AppContent() {
+  const { isReady } = useDb();
+  const { timezones, loading } = useTimezones();
   const { selectedTimezone, setSelectedTimezone } = useSelectedTimezone();
   const [clockSettings, setClockSettings] = useState({
     markingType: MarkingType.NUMBERS,
@@ -78,6 +38,14 @@ function AppContent({ db }: { db?: SQLiteDatabase }) {
     showSecondHand: true,
   });
 
+  if (!isReady) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" />
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -130,11 +98,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-
   },
   timezoneLabel: {
     alignItems: 'center',
-    marginVertical: 10
+    marginVertical: 10,
   },
   countryName: {
     fontSize: 20,

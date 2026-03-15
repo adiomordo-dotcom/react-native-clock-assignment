@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { SQLiteDatabase } from 'react-native-sqlite-storage';
+import { useEffect, useState } from 'react'
 import NetInfo from '@react-native-community/netinfo';
 import { getTimezonesAsync, Timezone } from '../api'
 import { addBulkTimezones, getTimezones } from '../db';
+import { useDb } from '../context/DbContext';
 
-function useTimezones(db?: SQLiteDatabase) {
+function useTimezones() {
+    const { db } = useDb();
     const [timezones, setTimezones] = useState<Timezone[]>([]);
     const [loading, setLoading] = useState(true);
 
