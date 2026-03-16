@@ -25,20 +25,22 @@ yarn android
 ### Folder structure
 ```
 src/
-├── api/          # Network layer (timezonedb.com fetch)
+├── api/          # Network layer (timezonedb.com fetch)\
 ├── components/   # UI components (AnalogClock, TimezoneSelector, OfflineBanner)
-├── context/      # TimezoneContext — shares selected timezone across the app
-├── db/           # SQLite setup + queries (timezones table, preferences table)
-├── hooks/        # useClockTime (animation loop), useTimezones (fetch + cache)
-└── utils/        # Pure functions — time math, name formatting, size ratios
+├── constants/    # Global configuration: API URLs and default layout settings
+├── context/      # State Management: Context API for global Timezone and App state
+├── db/           # Persistence Layer: SQLite schema, migrations, and CRUD operations
+├── hooks/        # Logic Layer: Custom hooks (useClockTime) for rAF and data syncing
+└── utils/        # Utilities: Math helpers for clock rotation and time-offset logic
 ```
 
 ### Key decisions
 
-- **Clock animation** uses `requestAnimationFrame` instead of `setInterval`. An alternative would be a 1-second `setInterval` updating state via context — simpler, but hands would jump discretely each second. rAF runs every frame (~16ms), giving smooth continuous hand movement. Elapsed time is measured from a start timestamp so floating-point errors don't accumulate over time.
+- **Clock animation** Uses `requestAnimationFrame` for a smooth 60fps sweep effect. Hand rotations are calculated by mapping time values (0-60) to a degree range (0-360) using a `transform: [{ rotate: 'Xdeg' }]` pattern, which is offloaded to the Native UI Thread via the Animated API for maximum performance.
 - **Timezone time** is calculated using `gmtOffset` (seconds from UTC) + UTC date getters — `Intl.DateTimeFormat` with `timeZone` returns `NaN` on Android's.
 - **Selected timezone** is managed via React Context. The context's setter wraps the SQLite save so any consumer just calls `setSelectedTimezone` — persistence is transparent.
 - **Business logic is separated from UI** — components receive data via props/context and only render. Hooks and utils handle all logic.
+- **Cleartext Traffic** — Since the TimeZoneDB free API uses http and Android blocks non-HTTPS traffic by default in release builds, I enabled android:usesCleartextTraffic in the Manifest. This ensures the app can fetch data in a production/release environment.
 
 ---
 
@@ -71,3 +73,5 @@ Saved as `JSON.stringify(timezone)` on selection. On next launch, loaded and par
 - No iOS build — no Mac available
 - UI settings (hand visibility, marker type) are not persisted — the infrastructure supports it but it's out of scope for the core requirements
 - SQLite `Timezones` table stores only `zoneName`, `countryName`, and `gmtOffset` — `countryCode` and `timestamp` from the API are intentionally omitted as they are not used anywhere in the app
+- API Key: The key is gitignored for security. However, for the provided APK executable, a temporary key has been bundled so the app is fully functional out-of-the-box.
+
